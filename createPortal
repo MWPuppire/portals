@@ -1,0 +1,29 @@
+#!/bin/bash
+source "${BASH_SOURCE%/*}"/portalUtils
+newPosition="$1"
+if [ -z "$newPosition" ]
+then
+  newPosition=`pwd`
+fi
+newPosition=`readlink -f "$newPosition"`
+if ! [ -d "$newPosition" ]
+then
+  echo "Cannot create a portal on '${newPosition}'; it is not a directory."
+  exit 1
+fi
+thisColor=$2
+otherColor=$3
+thisPosition=$(readPosition $thisColor)
+otherPosition=$(readPosition $otherColor)
+thisLink=$(portalLinkName $thisColor)
+otherLink=$(portalLinkName $otherColor)
+closePortal $thisColor removeOnlySymlink
+closePortal $otherColor removeOnlySymlink
+writePosition $thisColor "$newPosition"
+if [ -n "$otherPosition" ]
+then
+  ln -s "$otherPosition" "${newPosition}/${thisLink}"
+  ln -s "$newPosition" "${otherPosition}/${otherLink}"
+else
+  ln -s "$DIR/not-open" "${newPosition}/${thisLink}"
+fi

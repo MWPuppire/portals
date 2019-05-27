@@ -1,0 +1,33 @@
+#!/bin/bash
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+PORTAL_FILE=$DIR/storage
+function readPosition () {
+  local color=$1
+  echo $(grep ${color} "$PORTAL_FILE" | cut -d'=' -f2)
+}
+function writePosition () {
+  local color=$1
+  local position=$2
+  sed -i '.bak' "s,${color}=.*,,g" "$PORTAL_FILE"
+  echo "${color}=${position}" >> "$PORTAL_FILE"
+}
+function portalLinkName () {
+  local color=$1
+  printf "[${color}]"
+}
+function closePortal () {
+  local color=$1
+  local position=$(readPosition $color)
+  local linkFileName=$(portalLinkName $color)
+  if [ -n "$position" ] && [ -L "${position}/${linkFileName}" ]
+  then
+    rm "${position}/${linkFileName}"
+  fi
+  sed -i '.bak' "s,${color}=.*,${color}=,g" $PORTAL_FILE
+}

@@ -1,0 +1,17 @@
+#!/bin/bash
+PORTALS_SOURCE="${BASH_SOURCE%/*}"
+pBlue () {
+  "$PORTALS_SOURCE"/createPortal "$1" blue orange
+}
+pOrange () {
+  "$PORTALS_SOURCE"/createPortal "$1" orange blue
+}
+pWhere () {
+  "$PORTALS_SOURCE"/wherePortals
+}
+pClose () {
+  "$PORTALS_SOURCE"/closePortals
+}
+pJump () {
+  cd -P $@
+}

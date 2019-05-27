@@ -1,0 +1,11 @@
+#!/bin/bash
+source "${BASH_SOURCE%/*}"/portalUtils
+COLORS=$(cat $PORTAL_FILE | grep -v '^$')
+tc () {
+  echo "$(tr '[:lower:]' '[:upper:]' <<< ${1:0:1})${1:1}"
+}
+echo "$COLORS" | while IFS= read -r color
+do
+  echo "$(tc "$color")"
+done
+

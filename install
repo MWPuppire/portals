@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# This script installs Portals
+#
+
+{
+install_portals() {
+  local INSTALL_DIR
+  if [ -n "$PORTALS_DIR" ]; then
+    INSTALL_DIR="${PORTALS_DIR}"
+  else
+    INSTALL_DIR="${HOME}/.portals"
+  fi
+
+  mkdir -p "$INSTALL_DIR"
+
+  if [ -f "$INSTALL_DIR/portals" ]; then
+    echo "Portals is already installed in \"$INSTALL_DIR\"; aborting"
+    exit 0
+  else
+    echo "Downloading Portals to \"$INSTALL_DIR\""
+    git clone https://github.com/mwpuppire/portals $INSTALL_DIR
+  fi
+
+  try_profile() {
+    if [ -z "${1-}" ] || [ ! -f "${1}" ]; then
+      return 1
+    fi
+    echo "${1}"
+  }
+
+  local DETECTED_PROFILE
+  if [ "${PROFILE-}" = '/dev/null' ]; then
+    DETECTED_PROFILE=""
+  elif [ -n "${PROFILE}" ] && [ -f "${PROFILE}" ]; then
+    DETECTED_PROFILE="${PROFILE}"
+  elif [ -n "${BASH_VERSION-}" ]; then
+    if [ -f "$HOME/.bashrc" ]; then
+      DETECTED_PROFILE="$HOME/.bashrc"
+    elif [ -f "$HOME/.bash_profile" ]; then
+      DETECTED_PROFILE="$HOME/.bash_profile"
+    fi
+  elif [ -n "${ZSH_VERSION-}" ]; then
+    DETECTED_PROFILE="$HOME/.zshrc"
+  elif [ -z "$DETECTED_PROFILE" ]; then
+    for EACH_PROFILE in ".profile" ".bashrc" ".bash_profile" ".zshrc"; do
+      if DETECTED_PROFILE="$(try_profile "${HOME}/${EACH_PROFILE}")"; then
+        break
+      fi
+    done
+  fi
+
+  SOURCE_STR="export PORTALS_DIR=\"${INSTALL_DIR}\"\n[ -s \"\${PORTALS_DIR}/portals\" ] && source \"\${PORTALS_DIR}/portals\""
+  if [ -z "${DETECTED_PROFILE-}" ]; then
+    echo "Profile not found. Tried ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
+    echo "Create one of them and run this script again"
+    echo "Or append the following lines to the correct file yourself:"
+    printf "${SOURCE_STR}"
+    echo
+  else
+    echo "Appending portals source string to $DETECTED_PROFILE"
+    printf "${SOURCE_STR}" >> "$DETECTED_PROFILE"
+  fi
+}
+install_portals
+}
