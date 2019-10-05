@@ -1,5 +1,5 @@
 #!/bin/bash
-PORTALS_SOURCE="${BASH_SOURCE%/*}"
+PORTALS_SOURCE="${0%/*}"
 pBlue () {
   "$PORTALS_SOURCE"/createPortal "$1" blue orange
 }

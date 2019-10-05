@@ -14,7 +14,7 @@ function readPosition () {
 function writePosition () {
   local color=$1
   local position=$2
-  sed -i '.bak' "s,${color}=.*,,g" "$PORTAL_FILE"
+  sed -i '' "s,${color}=.*,,g" "$PORTAL_FILE"
   echo "${color}=${position}" >> "$PORTAL_FILE"
 }
 function portalLinkName () {
@@ -29,5 +29,5 @@ function closePortal () {
   then
     rm "${position}/${linkFileName}"
   fi
-  sed -i '.bak' "s,${color}=.*,${color}=,g" $PORTAL_FILE
+  sed -i '' "s,${color}=.*,${color}=,g" $PORTAL_FILE
 }
